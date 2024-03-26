@@ -25,14 +25,20 @@ impl Config {
 
 pub fn run (config: Config) -> Result<(), Box<dyn Error>> {
     let content = fs::read_to_string(&config.filename)?;
+
     if config.operation == "search" {
-        println!("Searching for {}", config.expression);
+        println!("Searching for '{}'...", config.expression);
         // implementing the searching function
         let search_res = search_word(&config.expression, &content, &config.is_sensitive);
         // printing the result
-        for line in search_res {
-            println!("{}", line)
+        if search_res.len() == 0 {
+            println!("No matched word")
+        } else {
+            for line in search_res {
+                println!("{}", line)
+            }
         }
+
     } else if config.operation == "replace" {
         println!("Replacing {} with {}", config.expression, config.filename);
     } else {
