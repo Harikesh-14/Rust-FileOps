@@ -8,16 +8,18 @@ Rust File Operations is a command-line tool written in Rust that allows users to
 
 ## How to Use
 
-- To use Rust File Operations, you need to have Rust installed on your system. You can install Rust from [here](https://www.rust-lang.org/tools/install).
+1. To use Rust File Operations, you need to have Rust installed on your system. You can install Rust from [here](https://www.rust-lang.org/tools/install).
 
-- Clone the repository using this command:
+2. Clone the repository using this command:
   ```
     git clone https://github.com/Harikesh-14/Rust-FileOps.git
   ```
-- ``` rust
+3. To generate the target folder, enter the given below command
+  ``` rust
     cargo build
   ```
-- ``` rust
+4. To run the program, use the given below rule
+  ``` rust
     cargo run <file operation>
   ```
 

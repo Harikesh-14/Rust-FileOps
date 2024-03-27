@@ -1,3 +1,4 @@
+use std::io;
 use std::fs;
 use std::error::Error;
 
@@ -24,9 +25,8 @@ impl Config {
 }
 
 pub fn run (config: Config) -> Result<(), Box<dyn Error>> {
-    let content = fs::read_to_string(&config.filename)?;
-
     if config.operation == "search" {
+        let content = fs::read_to_string(&config.filename)?;
         println!("Searching for '{}'...", config.expression);
         // implementing the searching function
         let search_res = search_word(&config.expression, &content, &config.is_sensitive);
@@ -40,7 +40,27 @@ pub fn run (config: Config) -> Result<(), Box<dyn Error>> {
         }
 
     } else if config.operation == "replace" {
-        println!("Replacing {} with {}", config.expression, config.filename);
+        let mut content = fs::read_to_string(&config.filename)?;
+        
+        let replace_res = search_word(&config.expression, &content, &config.is_sensitive);
+
+        if replace_res.len() == 0 {
+            println!("No matched word found");
+        } else {
+            println!("Replacing {} in {}", config.expression, config.filename);
+
+            let mut replaced_word = String::new();
+            println!("Enter the new word: ");
+            io::stdin()
+                .read_line(&mut replaced_word)
+                .expect("Expected an input");
+            let replaced_word = replaced_word.trim();
+
+            replace_word(&config.expression, replaced_word, &mut content, &config.is_sensitive)?;
+
+            fs::write(&config.filename, content)?;
+            println!("Word replaced successfully");
+        }
     } else {
         println!("Invalid operation");        
     }
@@ -68,6 +88,28 @@ pub fn search_word<'a> (word: &str, content: &'a str, is_sensitive: &str) -> Vec
     }
 
     result
+}
+
+pub fn replace_word (word_to_replace: &str, replacement_word: &str, content: &mut String, is_case_sensitive: &str) -> io::Result<()> {
+    if is_case_sensitive == "true" {
+        *content = content.replace(word_to_replace, replacement_word);
+    } else if is_case_sensitive == "false" {
+        let word_to_replace_lower = word_to_replace.to_lowercase();
+        let mut modified_content = String::new();
+        for line in content.lines() {
+            if line.to_lowercase().contains(&word_to_replace_lower) {
+                modified_content.push_str(&line.replace(word_to_replace, replacement_word));
+            } else {
+                modified_content.push_str(line);
+            }
+            modified_content.push('\n');
+        }
+        *content = modified_content;
+    } else {
+        eprintln!("Enter either true [CASE SENSITIVE] or false [CASE INSENSITIVE]");
+    }
+
+    Ok(())
 }
 
 #[cfg(test)]
