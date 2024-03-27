@@ -132,4 +132,27 @@ mod tests {
         assert_eq!(vec!["om, namah, shivaay"], search_word(word, content, is_sensitive));
     }
 
+    #[test]
+    fn case_sensitive_replace_function() {
+        let mut content = "Hello World\nThis is a test".to_string();
+        let word_to_replace = "World";
+        let replacement_word = "Rust";
+        let is_sensitive = "true";
+
+        replace_word(word_to_replace, replacement_word, &mut content, is_sensitive).unwrap();
+
+        assert_eq!(content, "Hello Rust\nThis is a test");
+    }
+
+    #[test]
+    fn case_insensitive_replace_function() {
+        let mut content = "Hello World\nThis is a test".to_string();
+        let word_to_replace = "World";
+        let replacement_word = "Rust";
+        let is_sensitive = "false";
+
+        replace_word(word_to_replace, replacement_word, &mut content, is_sensitive).unwrap();
+
+        assert_eq!(content, "Hello Rust\nThis is a test");
+    }
 }
