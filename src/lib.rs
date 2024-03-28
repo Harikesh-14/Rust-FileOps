@@ -1,6 +1,8 @@
 use std::io;
 use std::fs;
 use std::error::Error;
+use std::fs::{OpenOptions};
+use std::io::Write;
 
 pub struct Config {
     pub operation: String,
@@ -12,59 +14,70 @@ pub struct Config {
 impl Config {
     pub fn new(args: &[String]) -> Result<Config, &str> {
         if args.len() < 2 {
-            return Err("Arguments error")      
+            return Err("Arguments error")
         }
 
         let operation = args[1].clone();
-        let expression = args[2].clone();
-        let filename = args[3].clone();
-        let is_sensitive = args[4].clone();
+        let expression = args.get(2).cloned().unwrap_or_default();
+        let filename = args.get(3).cloned().unwrap_or_default();
+        let is_sensitive = args.get(4).cloned().unwrap_or_else(|| String::from("true"));
 
         Ok(Config { operation, expression, filename, is_sensitive })
     }
 }
 
-pub fn run (config: Config) -> Result<(), Box<dyn Error>> {
-    if config.operation == "search" {
-        let content = fs::read_to_string(&config.filename)?;
-        println!("Searching for '{}'...", config.expression);
-        // implementing the searching function
-        let search_res = search_word(&config.expression, &content, &config.is_sensitive);
-        // printing the result
-        if search_res.len() == 0 {
-            println!("No matched word")
-        } else {
-            for line in search_res {
-                println!("{}", line)
+pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
+    match config.operation.as_str() {
+        "search" => {
+            let content = fs::read_to_string(&config.filename)?;
+            println!("Searching for '{}'...", config.expression);
+            let search_res = search_word(&config.expression, &content, &config.is_sensitive);
+            if search_res.is_empty() {
+                println!("No matched word");
+            } else {
+                for line in search_res {
+                    println!("{}", line);
+                }
             }
         }
-
-    } else if config.operation == "replace" {
-        let mut content = fs::read_to_string(&config.filename)?;
-        
-        let replace_res = search_word(&config.expression, &content, &config.is_sensitive);
-
-        if replace_res.len() == 0 {
-            println!("No matched word found");
-        } else {
-            println!("Replacing {} in {}", config.expression, config.filename);
-
-            let mut replaced_word = String::new();
-            println!("Enter the new word: ");
-            io::stdin()
-                .read_line(&mut replaced_word)
-                .expect("Expected an input");
-            let replaced_word = replaced_word.trim();
-
-            replace_word(&config.expression, replaced_word, &mut content, &config.is_sensitive)?;
-
-            fs::write(&config.filename, content)?;
-            println!("Word replaced successfully");
+        "replace" => {
+            let mut content = fs::read_to_string(&config.filename)?;
+            let replace_res = search_word(&config.expression, &content, &config.is_sensitive);
+            if replace_res.is_empty() {
+                println!("No matched word found");
+            } else {
+                println!("Replacing {} in {}", config.expression, config.filename);
+                let mut replaced_word = String::new();
+                println!("Enter the new word: ");
+                io::stdin()
+                    .read_line(&mut replaced_word)
+                    .expect("Expected an input");
+                let replaced_word = replaced_word.trim();
+                replace_word(&config.expression, replaced_word, &mut content, &config.is_sensitive)?;
+                fs::write(&config.filename, content)?;
+                println!("Word replaced successfully");
+            }
         }
-    } else {
-        println!("Invalid operation");        
+        "write" => {
+            if config.expression == "-a" {
+                println!("Write here: ");
+                let mut content = String::new();
+                io::stdin()
+                    .read_line(&mut content)
+                    .expect("Expected an input");
+                let content = content.trim().to_string();
+                match write_in_file(&content, &config.filename) {
+                    Ok(_) => println!("Successfully wrote to the file!"),
+                    Err(err) => eprintln!("Error writing to file: {}", err),
+                }
+            } else {
+                println!("Did you mean cargo run write -a <filename> ?");
+            }
+        }
+        _ => {
+            println!("Invalid operation");
+        }
     }
-
     Ok(())
 }
 
@@ -109,6 +122,18 @@ pub fn replace_word (word_to_replace: &str, replacement_word: &str, content: &mu
         eprintln!("Enter either true [CASE SENSITIVE] or false [CASE INSENSITIVE]");
     }
 
+    Ok(())
+}
+
+pub fn write_in_file(content: &String, filename: &str) -> io::Result<()> {
+    let mut file = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(filename)?;
+
+    writeln!(file, "{}", content)?;
+
+    println!("Successfully appended the file");
     Ok(())
 }
 
