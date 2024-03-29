@@ -4,13 +4,17 @@ Rust File Operations is a command-line tool written in Rust that allows users to
 
 ## Features
 
+- **Create:** Create a new file.
+- **Append:** Append a word or a sentence in a file.
 - **Search:** Search for a word or expression in a file.
+- **Replace:** Replace a word or an expression in a file.
+- **Delete:** Delete a particular file
 
 ## How to Use
 
 1. To use Rust File Operations, you need to have Rust installed on your system. You can install Rust from [here](https://www.rust-lang.org/tools/install).
 
-2. Clone the repository using this command:
+2. Clone the repository using this command.
   ```
     git clone https://github.com/Harikesh-14/Rust-FileOps.git
   ```
@@ -22,6 +26,18 @@ Rust File Operations is a command-line tool written in Rust that allows users to
   ``` rust
     cargo run <file operation>
   ```
+
+### Create Operation
+To create a file in the main directory, follow these steps:
+1. Open a terminal or command prompt.
+
+2. Navigate to the directory where the project is located.
+
+3. Run the following command: 
+
+    ``` rust
+   cargo run create -a <filename>
+   ``` 
 
 ### Search Operation
 

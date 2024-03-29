@@ -1,7 +1,7 @@
 use std::io;
 use std::fs;
 use std::error::Error;
-use std::fs::{OpenOptions};
+use std::fs::{File, OpenOptions};
 use std::io::Write;
 
 pub struct Config {
@@ -71,7 +71,17 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
                     Err(err) => eprintln!("Error writing to file: {}", err),
                 }
             } else {
-                println!("Did you mean cargo run write -a <filename> ?");
+                println!("Did you mean `cargo run write -a <filename>` ?");
+            }
+        }
+        "create" => {
+            if config.expression == "-a" {
+                match create_file(&config.filename) {
+                    Ok(_) => println!("Successfully created the file"),
+                    Err(err) => println!("Error creating the file: {}", err),
+                }
+            } else {
+                println!("Did you mean `cargo run create -a <filename>` ?");
             }
         }
         _ => {
@@ -79,6 +89,11 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
         }
     }
     Ok(())
+}
+
+pub fn create_file (filename: &str) -> io::Result<File> {
+    let file = File::create(filename)?;
+    Ok(file)
 }
 
 pub fn search_word<'a> (word: &str, content: &'a str, is_sensitive: &str) -> Vec<&'a str> {
