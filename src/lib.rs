@@ -1,7 +1,7 @@
 use std::io;
 use std::fs;
 use std::error::Error;
-use std::fs::{File, OpenOptions, remove_file};
+use std::fs::{create_dir, File, OpenOptions, remove_dir, remove_file};
 use std::io::Write;
 
 pub struct Config {
@@ -94,6 +94,26 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
                 println!("Did you mean `cargo run delete -d <filename>` ?");
             }
         }
+        "newdir" => {
+            if config.expression == "-a" {
+                match create_directory(&config.filename) {
+                    Ok(_) => println!("Directory {} has been created", config.filename),
+                    Err(err) => println!("Failed creating the directory: {}", err),
+                }
+            } else {
+                println!("Did you mean `cargo run delete -d <filename>` ?");
+            }
+        }
+        "dldir" => {
+            if config.expression == "-d" {
+                match delete_directory(&config.filename) {
+                    Ok(_) => println!("Deleted the directory {}", config.filename),
+                    Err(err) => println!("Error creating a directory: {}", err),
+                }
+            } else {
+                println!("Did you mean `cargo run dldir -d <filename>` ?");
+            }
+        }
         _ => {
             println!("Invalid operation");
         }
@@ -104,6 +124,11 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 pub fn create_file (filename: &str) -> io::Result<File> {
     let file = File::create(filename)?;
     Ok(file)
+}
+
+pub fn create_directory (directory_name: &str) -> io::Result<()> {
+    create_dir(directory_name)?;
+    Ok(())
 }
 
 pub fn search_word<'a> (word: &str, content: &'a str, is_sensitive: &str) -> Vec<&'a str> {
@@ -165,6 +190,11 @@ pub fn write_in_file(content: &String, filename: &str) -> io::Result<()> {
 pub fn delete (filename: &str) -> io::Result<()> {
     let file = remove_file(filename)?;
     Ok(file)
+}
+
+pub fn delete_directory (directory_name: &str) -> io::Result<()> {
+    remove_dir(directory_name)?;
+    Ok(())
 }
 
 #[cfg(test)]
