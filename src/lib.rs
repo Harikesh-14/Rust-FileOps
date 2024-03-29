@@ -1,7 +1,7 @@
 use std::io;
 use std::fs;
 use std::error::Error;
-use std::fs::{File, OpenOptions};
+use std::fs::{File, OpenOptions, remove_file};
 use std::io::Write;
 
 pub struct Config {
@@ -84,6 +84,16 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
                 println!("Did you mean `cargo run create -a <filename>` ?");
             }
         }
+        "delete" => {
+            if config.expression == "-d" {
+                match delete(&config.filename) {
+                    Ok(_) => println!("Successfully deleted the file"),
+                    Err(err) => println!("Error deleting the file: {}", err),
+                }
+            } else {
+                println!("Did you mean `cargo run delete -d <filename>` ?");
+            }
+        }
         _ => {
             println!("Invalid operation");
         }
@@ -150,6 +160,11 @@ pub fn write_in_file(content: &String, filename: &str) -> io::Result<()> {
 
     println!("Successfully appended the file");
     Ok(())
+}
+
+pub fn delete (filename: &str) -> io::Result<()> {
+    let file = remove_file(filename)?;
+    Ok(file)
 }
 
 #[cfg(test)]
