@@ -1,6 +1,6 @@
 # Rust FileOps
 
-Rust File Operations is a command-line tool written in Rust that allows users to perform various file operations such as searching, replacing, creating, and deleting files.
+Rust File Management CLI is a command-line tool written in Rust that provides essential file management functionalities. Whether you're working with files or directories, this tool simplifies common file operations with ease.
 
 ## Features
 
