@@ -1,7 +1,7 @@
 use std::io;
 use std::fs;
 use std::error::Error;
-use std::fs::{create_dir, File, OpenOptions, remove_dir, remove_file};
+use std::fs::{create_dir, File, OpenOptions, remove_dir_all, remove_file};
 use std::io::Write;
 
 pub struct Config {
@@ -19,7 +19,7 @@ impl Config {
 
         let operation = args[1].clone();
         let expression = args.get(2).cloned().unwrap_or_default();
-        let filename = args.get(3).cloned().unwrap_or_default();
+        let filename = args.get(3).cloned().unwrap_or_else(|| String::from("true"));
         let is_sensitive = args.get(4).cloned().unwrap_or_else(|| String::from("true"));
 
         Ok(Config { operation, expression, filename, is_sensitive })
@@ -114,6 +114,12 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
                 println!("Did you mean `cargo run dldir -d <filename>` ?");
             }
         }
+        "show" => {
+            match list_directory_content(&config.expression) {
+                Ok(_) => println!("-x-x-x-x-x-x-x-x-x-x-x-x-x-"),
+                Err(err) => println!("Error listing the content: {}", err),
+            }
+        }
         _ => {
             println!("Invalid operation");
         }
@@ -128,6 +134,17 @@ pub fn create_file (filename: &str) -> io::Result<File> {
 
 pub fn create_directory (directory_name: &str) -> io::Result<()> {
     create_dir(directory_name)?;
+    Ok(())
+}
+
+pub fn list_directory_content (dirname: &str) -> io::Result<()>{
+    for entry in fs::read_dir(dirname)? {
+        let entry = entry?;
+        let file_name = entry.file_name();
+        let file_name = file_name.to_string_lossy();
+        println!("{}", file_name);
+    }
+
     Ok(())
 }
 
@@ -193,7 +210,7 @@ pub fn delete (filename: &str) -> io::Result<()> {
 }
 
 pub fn delete_directory (directory_name: &str) -> io::Result<()> {
-    remove_dir(directory_name)?;
+    remove_dir_all(directory_name)?;
     Ok(())
 }
 

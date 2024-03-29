@@ -4,6 +4,7 @@ Rust File Operations is a command-line tool written in Rust that allows users to
 
 ## Features
 
+- **Show content:** Shows the files of the directory.
 - **Create file:** Create a new file.
 - **Create directory:** Create a new directory/folder. 
 - **Append file:** Append a word or a sentence in a file.
@@ -28,6 +29,25 @@ Rust File Operations is a command-line tool written in Rust that allows users to
   ``` rust
     cargo run <file operation>
   ```
+
+### Show content
+To list all the files and folders in a directory, follow these steps:
+1. Open a terminal or command prompt.
+
+2. Navigate to the directory where the project is located.
+
+3. Run the following command: 
+
+   #### For example:
+   1. To search in a particular directory
+   ``` rust
+   cargo run show <directory_name>
+   ``` 
+   
+   2. To search in the current directory
+   ``` rust
+   cargo run show .
+   ``` 
 
 ### Create a file
 To create a file in the main directory, follow these steps:
@@ -108,11 +128,11 @@ To replace a word or expression in a file, follow these steps:
    #### For example:
     - This command replaces the word "old" with "new" in the file "example.txt" with case sensitivity enabled.
         ``` rust
-        cargo run replace old new example.txt true
+        cargo run replace old example.txt true
         ```
     - This command replaces the word "old" with "new" in the file "example.txt" with case sensitivity disabled.
         ``` rust
-        cargo run replace old new example.txt false
+        cargo run replace old example.txt false
         ```
 
 This addition will provide clear instructions on how to use the replace function in your Rust FileOps tool.
